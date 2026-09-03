@@ -1272,7 +1272,7 @@ body.perf-mode .file-card:hover {
             type="text" 
             id="fileSearchInput" 
             class="search-input" 
-            placeholder="Введите имя файла..." 
+            placeholder="Введите имя файла (например: ibo.pptx)..." 
             autocomplete="off"
             spellcheck="false"
           >
@@ -1423,7 +1423,40 @@ body.perf-mode .file-card:hover {
 (function () {
   'use strict';
 
-  let repoFiles = [];
+  const DEFAULT_REPO_FILES = [
+    {
+      id: 'file-ibo-pptx',
+      name: 'ibo.pptx',
+      path: 'ibo.pptx',
+      ext: 'pptx',
+      size: 'Презентация PowerPoint',
+      category: 'docs',
+      icon: '📊',
+      downloadUrl: 'ibo.pptx'
+    },
+    {
+      id: 'file-readme-md',
+      name: 'README.md',
+      path: 'README.md',
+      ext: 'md',
+      size: '2.5 KB',
+      category: 'docs',
+      icon: '📝',
+      downloadUrl: 'README.md'
+    },
+    {
+      id: 'file-index-html',
+      name: 'index.html',
+      path: 'index.html',
+      ext: 'html',
+      size: '60 KB',
+      category: 'web',
+      icon: '🌐',
+      downloadUrl: 'index.html'
+    }
+  ];
+
+  let repoFiles = [...DEFAULT_REPO_FILES];
   let currentRepo = '';
   let currentBranch = 'main';
   let currentCategory = 'all';
@@ -1707,7 +1740,7 @@ body.perf-mode .file-card:hover {
       const data = await treeRes.json();
       if (!data.tree || !Array.isArray(data.tree)) throw new Error('Bad tree');
 
-      repoFiles = data.tree
+      const fetchedFiles = data.tree
         .filter((item) => item.type === 'blob')
         .map((item, index) => {
           const parts = item.path.split('/');
@@ -1723,9 +1756,15 @@ body.perf-mode .file-card:hover {
             sha: item.sha,
             category: categorizeFile(ext),
             icon: getFileIcon(ext),
-            downloadUrl: `https://raw.githubusercontent.com/${repo}/${branch}/${item.path}`
+            downloadUrl: item.path
           };
         });
+
+      fetchedFiles.forEach(f => {
+        if (!repoFiles.some(existing => existing.name.toLowerCase() === f.name.toLowerCase())) {
+          repoFiles.push(f);
+        }
+      });
 
       repoLoadingState.classList.add('hidden');
       renderGrid();
@@ -1733,6 +1772,7 @@ body.perf-mode .file-card:hover {
       console.warn('Could not auto-fetch GitHub repo tree:', err);
       repoLoadingState.classList.add('hidden');
       filesGrid.classList.remove('hidden');
+      renderGrid();
     }
   }
 
@@ -1747,15 +1787,17 @@ body.perf-mode .file-card:hover {
     if (['html', 'css', 'scss', 'js', 'jsx', 'ts', 'tsx', 'vue'].includes(ext)) return 'web';
     if (['py', 'go', 'rs', 'c', 'cpp', 'java', 'rb', 'php', 'sh'].includes(ext)) return 'code';
     if (['json', 'yml', 'yaml', 'toml', 'env', 'xml', 'ini'].includes(ext)) return 'configs';
-    if (['md', 'txt', 'pdf', 'doc'].includes(ext)) return 'docs';
+    if (['pptx', 'ppt', 'md', 'txt', 'pdf', 'doc', 'docx', 'xlsx', 'xls'].includes(ext)) return 'docs';
     if (['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp', 'ico', 'mp4', 'mp3'].includes(ext)) return 'media';
-    return 'code';
+    return 'docs';
   }
 
   function getFileIcon(ext) {
     const map = {
       html: '🌐', css: '🎨', js: '⚡', ts: '🔷', jsx: '⚛️', tsx: '⚛️',
       py: '🐍', json: '🛠️', yml: '🐳', yaml: '🐳', md: '📝', txt: '📄',
+      pptx: '📊', ppt: '📊', xlsx: '📈', xls: '📈', docx: '📄', doc: '📄', pdf: '📑',
+      zip: '📦', rar: '📦', tar: '📦', gz: '📦',
       svg: '🔮', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🎞️',
       sh: '💻', rs: '🦀', go: '🐹', java: '☕', c: '⚙️', cpp: '⚙️'
     };
@@ -1868,13 +1910,14 @@ body.perf-mode .file-card:hover {
     });
 
     if (matches.length === 0) {
+      const suggestName = q.includes('.') ? q : `${q}.pptx`;
       autocompleteDropdown.innerHTML = `
-        <div class="autocomplete-item" style="justify-content:center;color:var(--text-muted);padding:14px;">
-          <span>Файл "<strong>${escapeHtml(q)}</strong>" не найден</span>
+        <div class="autocomplete-item" data-action="download-direct" data-query="${escapeHtml(suggestName)}" style="justify-content:center;color:var(--neon-cyan);padding:14px;cursor:pointer;">
+          <span>📥 Скачать "<strong>${escapeHtml(suggestName)}</strong>" из репозитория</span>
         </div>
       `;
       autocompleteDropdown.classList.remove('hidden');
-      selectedDropdownIndex = -1;
+      selectedDropdownIndex = 0;
       return;
     }
 
@@ -1907,28 +1950,15 @@ body.perf-mode .file-card:hover {
     soundSuccess();
     showToast(`📥 Загрузка файла "${file.name}"...`);
 
-    try {
-      const res = await fetch(file.downloadUrl);
-      if (!res.ok) throw new Error('Network error');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    const a = document.createElement('a');
+    a.href = file.downloadUrl;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => {
       showToast(`✅ Файл "${file.name}" скачан!`);
-    } catch (e) {
-      const a = document.createElement('a');
-      a.href = file.downloadUrl;
-      a.target = '_blank';
-      a.download = file.name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
+    }, 600);
   }
 
   // Preview Modal
@@ -1967,7 +1997,7 @@ body.perf-mode .file-card:hover {
     } catch (err) {
       previewLoading.classList.add('hidden');
       modalCodeBlock.classList.remove('hidden');
-      modalCodeContent.textContent = `// Ссылка: ${file.downloadUrl}`;
+      modalCodeContent.textContent = `// Файл: ${file.name}\n// Путь: ${file.downloadUrl}\n// Нажмите кнопку "Скачать файл" ниже для загрузки.`;
     }
   }
 
@@ -1991,8 +2021,11 @@ body.perf-mode .file-card:hover {
 
     activeSearchQuery = q;
 
+    // 1. Exact match or basename match (e.g. 'ibo' matches 'ibo.pptx')
     const exactMatch = repoFiles.find(
-      (f) => f.name.toLowerCase() === q.toLowerCase() || f.path.toLowerCase() === q.toLowerCase()
+      (f) => f.name.toLowerCase() === q.toLowerCase() || 
+             f.path.toLowerCase() === q.toLowerCase() ||
+             f.name.toLowerCase().replace(/\.[^/.]+$/, "") === q.toLowerCase()
     );
 
     if (exactMatch) {
@@ -2002,7 +2035,32 @@ body.perf-mode .file-card:hover {
       return;
     }
 
-    renderGrid();
+    // 2. Partial match in existing files
+    const partial = repoFiles.find((f) => f.name.toLowerCase().includes(q.toLowerCase()));
+    if (partial) {
+      renderGrid(partial.id);
+      showToast(`🎯 Файл "${partial.name}" найден!`);
+      triggerFileDownload(partial);
+      return;
+    }
+
+    // 3. Fallback: file in repository folder
+    const filename = q.includes('.') ? q : `${q}.pptx`;
+    const ext = filename.split('.').pop().toLowerCase();
+    const dynamicFile = {
+      id: `file-dyn-${Date.now()}`,
+      name: filename,
+      path: filename,
+      ext: ext,
+      size: 'Файл репозитория',
+      category: categorizeFile(ext),
+      icon: getFileIcon(ext),
+      downloadUrl: filename
+    };
+    repoFiles.unshift(dynamicFile);
+    renderGrid(dynamicFile.id);
+    showToast(`📥 Запрос файла "${filename}"...`);
+    triggerFileDownload(dynamicFile);
   }
 
   // Events
@@ -2087,6 +2145,14 @@ body.perf-mode .file-card:hover {
     autocompleteDropdown.addEventListener('click', (e) => {
       const item = e.target.closest('.autocomplete-item');
       if (!item) return;
+
+      if (item.dataset.action === 'download-direct') {
+        const q = item.dataset.query;
+        fileSearchInput.value = q;
+        executeSearchOrDownload(q);
+        autocompleteDropdown.classList.add('hidden');
+        return;
+      }
 
       const fileId = item.dataset.id;
       const file = repoFiles.find((f) => f.id === fileId);
@@ -2215,6 +2281,7 @@ body.perf-mode .file-card:hover {
     updatePerfUI();
     updateSoundUI();
     initCyberCanvas();
+    renderGrid();
     setupEvents();
 
     const repo = detectRepo();
