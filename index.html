@@ -1,176 +1,2133 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Download Cheat</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V File System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+/* ==========================================================================
+   V FILE SYSTEM — PURE CYBER INTERFACE (SINGLE FILE)
+   ========================================================================== */
+:root {
+  --bg-main: #05070f;
+  --bg-card: rgba(14, 20, 38, 0.72);
+  --bg-card-hover: rgba(22, 32, 60, 0.85);
+  --bg-input: rgba(10, 15, 30, 0.88);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(0, 242, 254, 0.4);
 
-        body {
-            background: #0d0e15;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
+  --neon-cyan: #00f2fe;
+  --neon-purple: #8a2be2;
+  --neon-green: #00f5a0;
 
-        body::before {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(45deg, #ff0055, #7000ff);
-            border-radius: 50%;
-            top: -50px;
-            left: -50px;
-            filter: blur(150px);
-            opacity: 0.5;
-            z-index: 0;
-        }
+  --text-primary: #f0f4fc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
 
-        body::after {
-            content: '';
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            background: linear-gradient(45deg, #00ffcc, #0072ff);
-            border-radius: 50%;
-            bottom: -50px;
-            right: -50px;
-            filter: blur(150px);
-            opacity: 0.5;
-            z-index: 0;
-        }
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
-        .container {
-            position: relative;
-            z-index: 1;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 40px 30px;
-            border-radius: 24px;
-            text-align: center;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 1s ease-out;
-        }
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
 
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(45deg, #fff, #a5a5a5);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 1px;
-        }
+  --transition-fast: 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-        p {
-            color: #8a8b98;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-        .btn-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
 
-        .download-btn {
-            position: relative;
-            text-decoration: none;
-            padding: 16px 40px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #fff;
-            background: linear-gradient(90deg, #7000ff, #ff0055);
-            background-size: 200% auto;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            outline: none;
-            box-shadow: 0 10px 20px rgba(112, 0, 255, 0.3);
-            transition: 0.5s ease;
-            width: 100%;
-            max-width: 280px;
-            display: inline-block;
-            animation: pulse 2s infinite;
-        }
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
 
-        .download-btn:hover {
-            background-position: right center;
-            box-shadow: 0 15px 30px rgba(255, 0, 85, 0.5);
-            transform: translateY(-3px);
-        }
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #060914;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 242, 254, 0.25);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 242, 254, 0.5);
+}
 
-        .download-btn:active {
-            transform: translateY(-1px);
-            box-shadow: 0 5px 10px rgba(255, 0, 85, 0.3);
-        }
+#cyberCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+.grid-overlay {
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0, 242, 254, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 242, 254, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 90%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 90%);
+  pointer-events: none;
+  z-index: 1;
+}
 
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 0 0 rgba(112, 0, 255, 0.4), 0 10px 20px rgba(112, 0, 255, 0.3);
-            }
-            70% {
-                box-shadow: 0 0 0 15px rgba(112, 0, 255, 0), 0 10px 20px rgba(112, 0, 255, 0.3);
-            }
-            100% {
-                box-shadow: 0 0 0 0 rgba(112, 0, 255, 0), 0 10px 20px rgba(112, 0, 255, 0.3);
-            }
-        }
+.ambient-glow {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.35;
+  animation: pulseAmbient 10s ease-in-out infinite alternate;
+}
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            h1 {
-                font-size: 1.7rem;
-            }
-            p {
-                font-size: 0.85rem;
-                margin-bottom: 25px;
-            }
-            .download-btn {
-                padding: 14px 30px;
-                font-size: 1rem;
-            }
-        }
-    </style>
+.glow-1 {
+  top: -100px;
+  right: 15%;
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, #7928ca 0%, transparent 70%);
+}
+
+.glow-2 {
+  top: 250px;
+  left: 10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #00f2fe 0%, transparent 70%);
+  animation-delay: -5s;
+}
+
+@keyframes pulseAmbient {
+  0% { transform: scale(0.9) translate(0, 0); opacity: 0.28; }
+  50% { transform: scale(1.1) translate(30px, -20px); opacity: 0.45; }
+  100% { transform: scale(0.95) translate(-20px, 20px); opacity: 0.32; }
+}
+
+.app-container {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.site-header {
+  padding: 24px 0 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(5, 7, 15, 0.7);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.brand-icon-wrapper {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.25));
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+}
+
+.brand-v {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 12px var(--neon-cyan);
+  line-height: 1;
+}
+
+.pulse-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: calc(var(--radius-md) + 3px);
+  border: 1px solid var(--neon-cyan);
+  opacity: 0;
+  animation: radarPulse 3s infinite;
+}
+
+@keyframes radarPulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #fff;
+}
+
+.control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 25, 48, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.control-btn .icon {
+  width: 18px;
+  height: 18px;
+  color: inherit;
+}
+
+.control-btn:hover {
+  background: rgba(26, 36, 68, 0.9);
+  color: var(--text-primary);
+  border-color: rgba(0, 242, 254, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Search Section */
+.search-section {
+  padding: 45px 0 25px;
+  text-align: center;
+}
+
+.search-box-container {
+  position: relative;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 8px 10px 8px 18px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 35px -5px rgba(0, 0, 0, 0.6), 0 0 25px rgba(0, 242, 254, 0.15);
+  transition: var(--transition-normal);
+}
+
+.search-box:focus-within {
+  border-color: var(--neon-cyan);
+  box-shadow: 0 12px 40px -5px rgba(0, 0, 0, 0.8), 0 0 35px rgba(0, 242, 254, 0.35);
+  transform: translateY(-2px);
+}
+
+.search-icon-left {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--neon-cyan);
+  margin-right: 12px;
+  filter: drop-shadow(0 0 6px var(--neon-cyan));
+  flex-shrink: 0;
+}
+
+.search-icon-left svg {
+  width: 22px;
+  height: 22px;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+
+.clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: var(--transition-fast);
+}
+
+.clear-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.clear-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.shortcut-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-right: 12px;
+  user-select: none;
+}
+
+.search-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 50%, #7928ca 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 22px;
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 242, 254, 0.35);
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.search-action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.search-action-btn:hover {
+  box-shadow: 0 6px 26px rgba(0, 242, 254, 0.55);
+  transform: scale(1.02);
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: rgba(11, 17, 33, 0.96);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85), 0 0 30px rgba(0, 242, 254, 0.2);
+  z-index: 100;
+  overflow: hidden;
+  max-height: 420px;
+  overflow-y: auto;
+  animation: fadeInDown 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+  background: rgba(0, 242, 254, 0.12);
+  border-left: 3px solid var(--neon-cyan);
+  padding-left: 21px;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.item-icon {
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.item-title-match {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.item-path-text {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.item-size-pill {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-secondary);
+}
+
+.item-download-quick {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 242, 254, 0.15);
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  color: var(--neon-cyan);
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+
+.item-download-quick:hover {
+  background: var(--neon-cyan);
+  color: #05070f;
+}
+
+/* Category Filters */
+.category-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.category-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(14, 20, 38, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 9px 16px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+}
+
+.category-btn:hover {
+  background: rgba(22, 32, 60, 0.9);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.category-btn.active {
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.15), rgba(121, 40, 202, 0.2));
+  border-color: var(--neon-cyan);
+  color: #fff;
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+}
+
+/* Catalog & File Cards */
+.catalog-section {
+  margin-bottom: 48px;
+}
+
+.files-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 22px;
+}
+
+.file-card {
+  position: relative;
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.35s ease;
+  overflow: hidden;
+}
+
+.file-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.file-card:hover {
+  transform: translateY(-6px) scale(1.015);
+  border-color: rgba(0, 242, 254, 0.45);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 242, 254, 0.2);
+  background: var(--bg-card-hover);
+}
+
+.file-card:hover::before {
+  opacity: 1;
+}
+
+.file-card.highlight-target {
+  animation: targetPulse 1.8s ease-in-out infinite alternate;
+  border-color: var(--neon-cyan);
+}
+
+@keyframes targetPulse {
+  0% { box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+  100% { box-shadow: 0 0 45px rgba(0, 242, 254, 0.7); }
+}
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.file-icon-box {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.card-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-ext {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 242, 254, 0.12);
+  color: var(--neon-cyan);
+  border: 1px solid rgba(0, 242, 254, 0.25);
+  text-transform: uppercase;
+}
+
+.badge-size {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
+}
+
+.card-middle {
+  margin-bottom: 18px;
+}
+
+.file-name {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  word-break: break-all;
+  margin-bottom: 6px;
+}
+
+.file-path {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  word-break: break-all;
+  margin-bottom: 10px;
+}
+
+.card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.card-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-preview-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.card-preview-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.card-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(121, 40, 202, 0.25));
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  color: var(--neon-cyan);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.card-download-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.card-download-btn:hover {
+  background: var(--neon-cyan);
+  color: #05070f;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.4);
+}
+
+/* Loading & Not Found States */
+.state-box {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.state-card {
+  max-width: 680px;
+  margin: 0 auto;
+  background: var(--bg-card);
+  border: 1px dashed rgba(0, 242, 254, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 40px 30px;
+  backdrop-filter: blur(16px);
+}
+
+.state-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 16px;
+  color: var(--neon-cyan);
+}
+
+.state-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.state-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.highlight-query {
+  color: var(--neon-cyan);
+  font-family: var(--font-mono);
+}
+
+.state-desc {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.suggestions-wrap {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 22px;
+  text-align: left;
+}
+
+.suggestions-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.suggestions-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.suggestion-chip:hover {
+  background: rgba(0, 242, 254, 0.1);
+  border-color: rgba(0, 242, 254, 0.3);
+}
+
+.sugg-name {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sugg-action {
+  font-size: 0.72rem;
+  color: var(--neon-cyan);
+}
+
+.cyber-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 242, 254, 0.15);
+  border-top-color: var(--neon-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 6, 12, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-dialog {
+  background: #090e1c;
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(0, 242, 254, 0.25);
+  width: 100%;
+  max-width: 820px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(14, 21, 38, 0.9);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modal-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.window-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.dot-red { background: #ff5f56; }
+.dot-yellow { background: #ffbd2e; }
+.dot-green { background: #27c93f; }
+
+.modal-title-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-file-icon {
+  font-size: 1.2rem;
+}
+
+.modal-file-name {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.modal-file-size {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--neon-cyan);
+  background: rgba(0, 242, 254, 0.1);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modal-close-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal-body {
+  padding: 18px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(121, 40, 202, 0.2);
+  border: 1px solid rgba(121, 40, 202, 0.4);
+  color: #c084fc;
+  text-transform: uppercase;
+}
+
+.file-path-text {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.preview-viewport {
+  position: relative;
+  background: #05070f;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  min-height: 240px;
+  max-height: 480px;
+  overflow: auto;
+  padding: 18px;
+}
+
+.preview-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: #05070f;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--neon-cyan);
+}
+
+.code-block {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.media-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.media-preview img,
+.media-preview svg {
+  max-width: 100%;
+  max-height: 340px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 0 30px rgba(0, 242, 254, 0.2);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  background: rgba(14, 21, 38, 0.9);
+  border-top: 1px solid var(--border-subtle);
+  gap: 12px;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.cyber-btn-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #00f2fe, #7928ca);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 242, 254, 0.35);
+  transition: var(--transition-fast);
+}
+
+.cyber-btn-glow:hover {
+  filter: brightness(1.15);
+  transform: translateY(-2px);
+}
+
+/* Toast */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(11, 17, 33, 0.95);
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  color: #fff;
+  font-size: 0.88rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 254, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  animation: toastSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  max-width: 400px;
+}
+
+@keyframes toastSlideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.toast.toast-exit {
+  animation: toastSlideOut 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastSlideOut {
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Footer */
+.site-footer {
+  margin-top: auto;
+  padding: 24px 0 10px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .search-box { flex-wrap: wrap; padding: 12px; }
+  .search-action-btn { width: 100%; margin-top: 10px; justify-content: center; }
+  .shortcut-tag { display: none; }
+}
+  </style>
 </head>
 <body>
+  <!-- Background Interactive Canvas -->
+  <canvas id="cyberCanvas"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
 
-    <div class="container">
-        <h1>Cheat Loader</h1>
-        <p>Нажмите кнопку ниже, чтобы скачать последнюю версию конфигурации для вашего устройства.</p>
-        <div class="btn-container">
-            <a href="1.apk" download="cheat.sh" class="download-btn">Скачать файл</a>
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon-wrapper">
+            <span class="brand-v">V</span>
+            <div class="pulse-ring"></div>
+          </div>
+          <span class="brand-title">V File System</span>
         </div>
+
+        <button id="soundToggleBtn" class="control-btn" title="Звуковые эффекты">
+          <svg id="soundIconOn" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+          <svg id="soundIconOff" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4.93"></path>
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-box-container">
+        <div class="search-box" id="searchBoxWrapper">
+          <div class="search-icon-left">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </div>
+          
+          <input 
+            type="text" 
+            id="fileSearchInput" 
+            class="search-input" 
+            placeholder="Введите имя файла..." 
+            autocomplete="off"
+            spellcheck="false"
+          >
+
+          <button id="clearSearchBtn" class="clear-btn hidden" title="Очистить ввод">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+
+          <div class="shortcut-tag" title="Нажмите '/' для фокуса">
+            <span>/</span>
+          </div>
+
+          <button id="searchExecuteBtn" class="search-action-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Найти & Скачать</span>
+          </button>
+        </div>
+
+        <div id="autocompleteDropdown" class="autocomplete-dropdown hidden"></div>
+      </div>
+    </section>
+
+    <!-- Category Filter Tabs -->
+    <div class="category-tabs" id="categoryTabs">
+      <button class="category-btn active" data-category="all">📁 Все файлы</button>
+      <button class="category-btn" data-category="code">⚙️ Код & Скрипты</button>
+      <button class="category-btn" data-category="web">🌐 HTML / CSS / JS</button>
+      <button class="category-btn" data-category="configs">🛠️ Конфиги</button>
+      <button class="category-btn" data-category="docs">📄 Документы</button>
+      <button class="category-btn" data-category="media">🖼️ Медиа & Графика</button>
     </div>
 
+    <!-- Catalog Section -->
+    <section class="catalog-section">
+      <!-- Loading State -->
+      <div id="repoLoadingState" class="state-box">
+        <div class="cyber-spinner"></div>
+      </div>
+
+      <!-- Files Grid -->
+      <div class="files-grid hidden" id="filesGrid"></div>
+
+      <!-- Not Found State -->
+      <div id="notFoundState" class="state-box hidden">
+        <div class="state-card">
+          <div class="state-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              <line x1="8" y1="11" x2="14" y2="11"></line>
+            </svg>
+          </div>
+          <h3 class="state-title">Файл <span id="notFoundQuery" class="highlight-query"></span> не найден</h3>
+          <p class="state-desc">Доступные файлы из репозитория:</p>
+
+          <div class="suggestions-wrap">
+            <div class="suggestions-list" id="suggestedFilesList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <span class="footer-logo">V File System</span>
+      <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">© 2026</span>
+    </footer>
+
+  </div>
+
+  <!-- Modal: File Previewer -->
+  <div id="filePreviewModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-window-controls">
+          <span class="window-dot dot-red" id="modalCloseDot"></span>
+          <span class="window-dot dot-yellow"></span>
+          <span class="window-dot dot-green"></span>
+        </div>
+        
+        <div class="modal-title-box">
+          <span class="modal-file-icon" id="modalFileIcon">📄</span>
+          <span class="modal-file-name" id="modalFileName">file.ext</span>
+          <span class="modal-file-size" id="modalFileSize">0 KB</span>
+        </div>
+
+        <button class="modal-close-btn" id="modalCloseBtn" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-toolbar">
+          <div class="toolbar-left">
+            <span class="badge" id="modalFileTypeBadge">FILE</span>
+            <span class="file-path-text" id="modalFilePath">path</span>
+          </div>
+          <div class="toolbar-right">
+            <button id="modalCopyBtn" class="toolbar-btn" title="Скопировать код">
+              <span>Копировать</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="preview-viewport" id="previewViewport">
+          <div class="preview-loading" id="previewLoading">
+            <div class="cyber-spinner"></div>
+          </div>
+          <pre class="code-block" id="modalCodeBlock"><code id="modalCodeContent"></code></pre>
+          <div class="media-preview hidden" id="modalMediaContent"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="secondary-btn" id="modalCancelBtn">Закрыть</button>
+        <button class="cyber-btn-glow" id="modalDownloadBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Скачать файл</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- JavaScript Engine -->
+  <script>
+/**
+ * ============================================================================
+ * V FILE SYSTEM — STANDALONE ENGINE
+ * ============================================================================
+ */
+(function () {
+  'use strict';
+
+  let repoFiles = [];
+  let currentRepo = '';
+  let currentBranch = 'main';
+  let currentCategory = 'all';
+  let activeSearchQuery = '';
+  let selectedDropdownIndex = -1;
+  let soundEnabled = localStorage.getItem('v_sound') !== 'false';
+  let activePreviewFile = null;
+
+  const fileSearchInput = document.getElementById('fileSearchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const searchExecuteBtn = document.getElementById('searchExecuteBtn');
+  const autocompleteDropdown = document.getElementById('autocompleteDropdown');
+  const filesGrid = document.getElementById('filesGrid');
+  const notFoundState = document.getElementById('notFoundState');
+  const notFoundQuery = document.getElementById('notFoundQuery');
+  const suggestedFilesList = document.getElementById('suggestedFilesList');
+  const categoryTabs = document.getElementById('categoryTabs');
+  const repoLoadingState = document.getElementById('repoLoadingState');
+
+  // Preview Modal
+  const filePreviewModal = document.getElementById('filePreviewModal');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalCloseDot = document.getElementById('modalCloseDot');
+  const modalCancelBtn = document.getElementById('modalCancelBtn');
+  const modalFileName = document.getElementById('modalFileName');
+  const modalFileSize = document.getElementById('modalFileSize');
+  const modalFileTypeBadge = document.getElementById('modalFileTypeBadge');
+  const modalFilePath = document.getElementById('modalFilePath');
+  const modalFileIcon = document.getElementById('modalFileIcon');
+  const modalCodeBlock = document.getElementById('modalCodeBlock');
+  const modalCodeContent = document.getElementById('modalCodeContent');
+  const modalMediaContent = document.getElementById('modalMediaContent');
+  const modalCopyBtn = document.getElementById('modalCopyBtn');
+  const modalDownloadBtn = document.getElementById('modalDownloadBtn');
+  const previewLoading = document.getElementById('previewLoading');
+
+  // Sound Controls
+  const soundToggleBtn = document.getElementById('soundToggleBtn');
+  const soundIconOn = document.getElementById('soundIconOn');
+  const soundIconOff = document.getElementById('soundIconOff');
+
+  // Audio Synthesizer
+  let audioCtx = null;
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      if (AudioContext) audioCtx = new AudioContext();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playTone(freq, type = 'sine', duration = 0.08, vol = 0.08) {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(vol, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
+  }
+
+  function soundHover() { playTone(780, 'triangle', 0.04, 0.02); }
+  function soundClick() { playTone(540, 'sine', 0.07, 0.05); }
+
+  function soundSuccess() {
+    if (!soundEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      [440, 660, 880].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.setValueAtTime(freq, now + i * 0.08);
+        gain.gain.setValueAtTime(0.06, now + i * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (i + 1) * 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.08);
+        osc.stop(now + (i + 1) * 0.08);
+      });
+    } catch (e) {}
+  }
+
+  function updateSoundUI() {
+    if (soundEnabled) {
+      soundIconOn.classList.remove('hidden');
+      soundIconOff.classList.add('hidden');
+    } else {
+      soundIconOn.classList.add('hidden');
+      soundIconOff.classList.remove('hidden');
+    }
+    localStorage.setItem('v_sound', soundEnabled ? 'true' : 'false');
+  }
+
+  // Canvas
+  function initCyberCanvas() {
+    const canvas = document.getElementById('cyberCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    let mouse = { x: -1000, y: -1000, radius: 150 };
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+    });
+
+    window.addEventListener('mouseout', () => {
+      mouse.x = -1000;
+      mouse.y = -1000;
+    });
+
+    const count = Math.min(Math.floor((width * height) / 16000), 75);
+    const particles = [];
+
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        radius: Math.random() * 2 + 1,
+        baseColor: Math.random() > 0.4 ? '0, 242, 254' : '121, 40, 202'
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        const dxMouse = mouse.x - p.x;
+        const dyMouse = mouse.y - p.y;
+        const distMouse = Math.sqrt(dxMouse * dxMouse + dyMouse * dyMouse);
+        if (distMouse < mouse.radius) {
+          const force = (mouse.radius - distMouse) / mouse.radius;
+          p.x -= (dxMouse / distMouse) * force * 2.5;
+          p.y -= (dyMouse / distMouse) * force * 2.5;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${p.baseColor}, 0.6)`;
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 130) {
+            const alpha = (1 - dist / 130) * 0.22;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(${p.baseColor}, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  }
+
+  // GitHub Repo Detection & Fetch
+  function detectRepo() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('repo')) return urlParams.get('repo').trim();
+
+    const host = window.location.hostname;
+    const path = window.location.pathname.replace(/^\/|\/$/g, '');
+
+    if (host.endsWith('.github.io')) {
+      const owner = host.split('.')[0];
+      const repo = path.split('/')[0] || owner;
+      return `${owner}/${repo}`;
+    }
+
+    return localStorage.getItem('v_github_repo') || '';
+  }
+
+  async function loadGitHubFiles(repo) {
+    if (!repo) {
+      repoLoadingState.classList.add('hidden');
+      filesGrid.classList.remove('hidden');
+      return;
+    }
+
+    currentRepo = repo;
+    localStorage.setItem('v_github_repo', repo);
+
+    repoLoadingState.classList.remove('hidden');
+    filesGrid.classList.add('hidden');
+    notFoundState.classList.add('hidden');
+
+    try {
+      let branch = 'main';
+      const repoMetaRes = await fetch(`https://api.github.com/repos/${repo}`);
+      if (repoMetaRes.ok) {
+        const repoMeta = await repoMetaRes.json();
+        branch = repoMeta.default_branch || 'main';
+      }
+      currentBranch = branch;
+
+      const treeRes = await fetch(`https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`);
+      if (!treeRes.ok) throw new Error(`HTTP ${treeRes.status}`);
+
+      const data = await treeRes.json();
+      if (!data.tree || !Array.isArray(data.tree)) throw new Error('Bad tree');
+
+      repoFiles = data.tree
+        .filter((item) => item.type === 'blob')
+        .map((item, index) => {
+          const parts = item.path.split('/');
+          const filename = parts.pop();
+          const ext = filename.includes('.') ? filename.split('.').pop().toLowerCase() : '';
+          return {
+            id: `gh-${index}-${item.sha.substr(0, 7)}`,
+            name: filename,
+            path: item.path,
+            ext: ext,
+            size: formatFileSize(item.size),
+            rawSize: item.size || 0,
+            sha: item.sha,
+            category: categorizeFile(ext),
+            icon: getFileIcon(ext),
+            downloadUrl: `https://raw.githubusercontent.com/${repo}/${branch}/${item.path}`
+          };
+        });
+
+      repoLoadingState.classList.add('hidden');
+      renderGrid();
+    } catch (err) {
+      console.warn('Could not auto-fetch GitHub repo tree:', err);
+      repoLoadingState.classList.add('hidden');
+      filesGrid.classList.remove('hidden');
+    }
+  }
+
+  function formatFileSize(bytes) {
+    if (!bytes && bytes !== 0) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function categorizeFile(ext) {
+    if (['html', 'css', 'scss', 'js', 'jsx', 'ts', 'tsx', 'vue'].includes(ext)) return 'web';
+    if (['py', 'go', 'rs', 'c', 'cpp', 'java', 'rb', 'php', 'sh'].includes(ext)) return 'code';
+    if (['json', 'yml', 'yaml', 'toml', 'env', 'xml', 'ini'].includes(ext)) return 'configs';
+    if (['md', 'txt', 'pdf', 'doc'].includes(ext)) return 'docs';
+    if (['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp', 'ico', 'mp4', 'mp3'].includes(ext)) return 'media';
+    return 'code';
+  }
+
+  function getFileIcon(ext) {
+    const map = {
+      html: '🌐', css: '🎨', js: '⚡', ts: '🔷', jsx: '⚛️', tsx: '⚛️',
+      py: '🐍', json: '🛠️', yml: '🐳', yaml: '🐳', md: '📝', txt: '📄',
+      svg: '🔮', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🎞️',
+      sh: '💻', rs: '🦀', go: '🐹', java: '☕', c: '⚙️', cpp: '⚙️'
+    };
+    return map[ext] || '📄';
+  }
+
+  // Filter & Render
+  function filterFiles() {
+    const q = activeSearchQuery.toLowerCase().trim();
+
+    return repoFiles.filter((file) => {
+      if (currentCategory !== 'all' && file.category !== currentCategory) return false;
+      if (!q) return true;
+      return file.name.toLowerCase().includes(q) || file.path.toLowerCase().includes(q);
+    });
+  }
+
+  function renderGrid(targetHighlightId = null) {
+    const matched = filterFiles();
+
+    if (matched.length === 0) {
+      filesGrid.innerHTML = '';
+      filesGrid.classList.add('hidden');
+      notFoundState.classList.remove('hidden');
+      notFoundQuery.textContent = activeSearchQuery || 'файл';
+      renderSuggestions();
+      return;
+    }
+
+    notFoundState.classList.add('hidden');
+    filesGrid.classList.remove('hidden');
+
+    filesGrid.innerHTML = matched
+      .map((file) => {
+        const isHighlight = file.id === targetHighlightId;
+
+        return `
+          <div class="file-card ${isHighlight ? 'highlight-target' : ''}" id="card-${file.id}">
+            <div>
+              <div class="card-top">
+                <div class="file-icon-box">${file.icon}</div>
+                <div class="card-badges">
+                  <span class="badge-ext">${file.ext || 'FILE'}</span>
+                  <span class="badge-size">${file.size}</span>
+                </div>
+              </div>
+
+              <div class="card-middle">
+                <h3 class="file-name" title="${escapeHtml(file.name)}">${highlightMatch(file.name, activeSearchQuery)}</h3>
+                <p class="file-path">${highlightMatch(file.path, activeSearchQuery)}</p>
+              </div>
+            </div>
+
+            <div class="card-bottom">
+              <div class="card-btn-group">
+                <button class="card-preview-btn" data-action="preview" data-id="${file.id}">
+                  Предпросмотр
+                </button>
+                <button class="card-download-btn" data-action="download" data-id="${file.id}">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  <span>Скачать</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
+
+    if (targetHighlightId) {
+      const el = document.getElementById(`card-${targetHighlightId}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function renderSuggestions() {
+    suggestedFilesList.innerHTML = repoFiles
+      .slice(0, 6)
+      .map(
+        (f) => `
+        <div class="suggestion-chip" data-name="${escapeHtml(f.name)}" data-id="${f.id}">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span>${f.icon}</span>
+            <span class="sugg-name">${escapeHtml(f.name)}</span>
+          </div>
+          <span class="sugg-action">Выбрать ➔</span>
+        </div>
+      `
+      )
+      .join('');
+  }
+
+  // Autocomplete
+  function updateAutocomplete() {
+    const q = fileSearchInput.value.toLowerCase().trim();
+
+    if (!q) {
+      autocompleteDropdown.classList.add('hidden');
+      autocompleteDropdown.innerHTML = '';
+      selectedDropdownIndex = -1;
+      return;
+    }
+
+    const matches = repoFiles.filter((f) => {
+      return f.name.toLowerCase().includes(q) || f.path.toLowerCase().includes(q);
+    });
+
+    if (matches.length === 0) {
+      autocompleteDropdown.innerHTML = `
+        <div class="autocomplete-item" style="justify-content:center;color:var(--text-muted);padding:14px;">
+          <span>Файл "<strong>${escapeHtml(q)}</strong>" не найден</span>
+        </div>
+      `;
+      autocompleteDropdown.classList.remove('hidden');
+      selectedDropdownIndex = -1;
+      return;
+    }
+
+    autocompleteDropdown.innerHTML = matches
+      .slice(0, 5)
+      .map((f, idx) => `
+        <div class="autocomplete-item ${idx === selectedDropdownIndex ? 'selected' : ''}" data-id="${f.id}" data-idx="${idx}">
+          <div class="item-left">
+            <span class="item-icon">${f.icon}</span>
+            <div class="item-info">
+              <span class="item-title-match">${highlightMatch(f.name, q)}</span>
+              <span class="item-path-text">${escapeHtml(f.path)}</span>
+            </div>
+          </div>
+          <div class="item-right">
+            <span class="item-size-pill">${f.size}</span>
+            <button class="item-download-quick" data-action="quick-download" data-id="${f.id}">
+              Скачать
+            </button>
+          </div>
+        </div>
+      `)
+      .join('');
+
+    autocompleteDropdown.classList.remove('hidden');
+  }
+
+  // Download
+  async function triggerFileDownload(file) {
+    soundSuccess();
+    showToast(`📥 Загрузка файла "${file.name}"...`);
+
+    try {
+      const res = await fetch(file.downloadUrl);
+      if (!res.ok) throw new Error('Network error');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showToast(`✅ Файл "${file.name}" скачан!`);
+    } catch (e) {
+      const a = document.createElement('a');
+      a.href = file.downloadUrl;
+      a.target = '_blank';
+      a.download = file.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
+
+  // Preview Modal
+  async function openFilePreview(file) {
+    activePreviewFile = file;
+    soundClick();
+
+    modalFileName.textContent = file.name;
+    modalFileSize.textContent = file.size;
+    modalFileTypeBadge.textContent = (file.ext || 'FILE').toUpperCase();
+    modalFilePath.textContent = file.path;
+    modalFileIcon.textContent = file.icon;
+
+    modalCodeContent.textContent = '';
+    previewLoading.classList.remove('hidden');
+    modalCodeBlock.classList.add('hidden');
+    modalMediaContent.classList.add('hidden');
+    modalMediaContent.innerHTML = '';
+
+    filePreviewModal.classList.remove('hidden');
+
+    try {
+      const isMedia = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(file.ext);
+      if (isMedia) {
+        previewLoading.classList.add('hidden');
+        modalMediaContent.classList.remove('hidden');
+        modalMediaContent.innerHTML = `<img src="${file.downloadUrl}" alt="${escapeHtml(file.name)}" style="max-width:100%;max-height:360px;" />`;
+      } else {
+        const res = await fetch(file.downloadUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        previewLoading.classList.add('hidden');
+        modalCodeBlock.classList.remove('hidden');
+        modalCodeContent.textContent = text;
+      }
+    } catch (err) {
+      previewLoading.classList.add('hidden');
+      modalCodeBlock.classList.remove('hidden');
+      modalCodeContent.textContent = `// Ссылка: ${file.downloadUrl}`;
+    }
+  }
+
+  function closeFilePreview() {
+    filePreviewModal.classList.add('hidden');
+    activePreviewFile = null;
+    soundClick();
+  }
+
+  // Search Execute
+  function executeSearchOrDownload(query = '') {
+    const q = (query || fileSearchInput.value).trim();
+    autocompleteDropdown.classList.add('hidden');
+    soundClick();
+
+    if (!q) {
+      activeSearchQuery = '';
+      renderGrid();
+      return;
+    }
+
+    activeSearchQuery = q;
+
+    const exactMatch = repoFiles.find(
+      (f) => f.name.toLowerCase() === q.toLowerCase() || f.path.toLowerCase() === q.toLowerCase()
+    );
+
+    if (exactMatch) {
+      renderGrid(exactMatch.id);
+      showToast(`🎯 Файл "${exactMatch.name}" найден!`);
+      triggerFileDownload(exactMatch);
+      return;
+    }
+
+    renderGrid();
+  }
+
+  // Events
+  function setupEvents() {
+    fileSearchInput.addEventListener('input', () => {
+      const val = fileSearchInput.value;
+      if (val.length > 0) {
+        clearSearchBtn.classList.remove('hidden');
+      } else {
+        clearSearchBtn.classList.add('hidden');
+      }
+      activeSearchQuery = val;
+      updateAutocomplete();
+      renderGrid();
+    });
+
+    fileSearchInput.addEventListener('focus', () => {
+      if (fileSearchInput.value.trim()) updateAutocomplete();
+    });
+
+    fileSearchInput.addEventListener('keydown', (e) => {
+      const items = autocompleteDropdown.querySelectorAll('.autocomplete-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        selectedDropdownIndex = Math.min(selectedDropdownIndex + 1, items.length - 1);
+        highlightDropdownItem(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        selectedDropdownIndex = Math.max(selectedDropdownIndex - 1, 0);
+        highlightDropdownItem(items);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!autocompleteDropdown.classList.contains('hidden') && selectedDropdownIndex >= 0 && items[selectedDropdownIndex]) {
+          items[selectedDropdownIndex].click();
+        } else {
+          executeSearchOrDownload();
+        }
+      } else if (e.key === 'Escape') {
+        autocompleteDropdown.classList.add('hidden');
+      }
+    });
+
+    function highlightDropdownItem(items) {
+      items.forEach((item, idx) => {
+        if (idx === selectedDropdownIndex) {
+          item.classList.add('selected');
+          item.scrollIntoView({ block: 'nearest' });
+        } else {
+          item.classList.remove('selected');
+        }
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement !== fileSearchInput) {
+        e.preventDefault();
+        fileSearchInput.focus();
+        fileSearchInput.select();
+      }
+    });
+
+    clearSearchBtn.addEventListener('click', () => {
+      fileSearchInput.value = '';
+      clearSearchBtn.classList.add('hidden');
+      autocompleteDropdown.classList.add('hidden');
+      activeSearchQuery = '';
+      fileSearchInput.focus();
+      renderGrid();
+      soundClick();
+    });
+
+    searchExecuteBtn.addEventListener('click', () => {
+      executeSearchOrDownload();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-box-container')) {
+        autocompleteDropdown.classList.add('hidden');
+      }
+    });
+
+    autocompleteDropdown.addEventListener('click', (e) => {
+      const item = e.target.closest('.autocomplete-item');
+      if (!item) return;
+
+      const fileId = item.dataset.id;
+      const file = repoFiles.find((f) => f.id === fileId);
+      if (!file) return;
+
+      if (e.target.closest('[data-action="quick-download"]')) {
+        triggerFileDownload(file);
+      } else {
+        fileSearchInput.value = file.name;
+        executeSearchOrDownload(file.name);
+      }
+      autocompleteDropdown.classList.add('hidden');
+    });
+
+    categoryTabs.addEventListener('click', (e) => {
+      const btn = e.target.closest('.category-btn');
+      if (!btn) return;
+      soundClick();
+
+      document.querySelectorAll('.category-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      currentCategory = btn.dataset.category;
+      renderGrid();
+    });
+
+    filesGrid.addEventListener('click', (e) => {
+      const previewBtn = e.target.closest('[data-action="preview"]');
+      if (previewBtn) {
+        const file = repoFiles.find((f) => f.id === previewBtn.dataset.id);
+        if (file) openFilePreview(file);
+        return;
+      }
+
+      const downloadBtn = e.target.closest('[data-action="download"]');
+      if (downloadBtn) {
+        const file = repoFiles.find((f) => f.id === downloadBtn.dataset.id);
+        if (file) triggerFileDownload(file);
+        return;
+      }
+    });
+
+    document.addEventListener('mouseover', (e) => {
+      if (e.target.closest('button, .file-card')) soundHover();
+    });
+
+    suggestedFilesList.addEventListener('click', (e) => {
+      const chip = e.target.closest('.suggestion-chip');
+      if (!chip) return;
+      const name = chip.dataset.name;
+      fileSearchInput.value = name;
+      clearSearchBtn.classList.remove('hidden');
+      executeSearchOrDownload(name);
+    });
+
+    modalCloseBtn.addEventListener('click', closeFilePreview);
+    modalCloseDot.addEventListener('click', closeFilePreview);
+    modalCancelBtn.addEventListener('click', closeFilePreview);
+    filePreviewModal.addEventListener('click', (e) => {
+      if (e.target === filePreviewModal) closeFilePreview();
+    });
+
+    modalDownloadBtn.addEventListener('click', () => {
+      if (activePreviewFile) triggerFileDownload(activePreviewFile);
+    });
+
+    modalCopyBtn.addEventListener('click', () => {
+      if (!modalCodeContent.textContent) return;
+      soundClick();
+      navigator.clipboard.writeText(modalCodeContent.textContent).then(() => {
+        const span = modalCopyBtn.querySelector('span');
+        const orig = span.textContent;
+        span.textContent = 'Скопировано! ✓';
+        modalCopyBtn.style.color = 'var(--neon-green)';
+        setTimeout(() => {
+          span.textContent = orig;
+          modalCopyBtn.style.color = '';
+        }, 2000);
+      });
+    });
+
+    soundToggleBtn.addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      updateSoundUI();
+      if (soundEnabled) soundSuccess();
+    });
+  }
+
+  // Helpers
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function highlightMatch(text, query) {
+    if (!query || !text) return escapeHtml(text);
+    const escapedText = escapeHtml(text);
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    return escapedText.replace(regex, '<span style="color:var(--neon-cyan);font-weight:700;">$1</span>');
+  }
+
+  function showToast(message) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `<span>${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('toast-exit');
+      setTimeout(() => toast.remove(), 350);
+    }, 3800);
+  }
+
+  // Init
+  function init() {
+    updateSoundUI();
+    initCyberCanvas();
+    setupEvents();
+
+    const repo = detectRepo();
+    if (repo) {
+      loadGitHubFiles(repo);
+    } else {
+      repoLoadingState.classList.add('hidden');
+      filesGrid.classList.remove('hidden');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+  </script>
 </body>
 </html>
