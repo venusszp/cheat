@@ -1433,26 +1433,6 @@ body.perf-mode .file-card:hover {
       category: 'docs',
       icon: '📊',
       downloadUrl: 'ibo.pptx'
-    },
-    {
-      id: 'file-readme-md',
-      name: 'README.md',
-      path: 'README.md',
-      ext: 'md',
-      size: '2.5 KB',
-      category: 'docs',
-      icon: '📝',
-      downloadUrl: 'README.md'
-    },
-    {
-      id: 'file-index-html',
-      name: 'index.html',
-      path: 'index.html',
-      ext: 'html',
-      size: '60 KB',
-      category: 'web',
-      icon: '🌐',
-      downloadUrl: 'index.html'
     }
   ];
 
@@ -1737,11 +1717,22 @@ body.perf-mode .file-card:hover {
       const treeRes = await fetch(`https://api.github.com/repos/${repo}/git/trees/${branch}?recursive=1`);
       if (!treeRes.ok) throw new Error(`HTTP ${treeRes.status}`);
 
-      const data = await treeRes.json();
-      if (!data.tree || !Array.isArray(data.tree)) throw new Error('Bad tree');
+      const IGNORED_FILES = [
+        'index.html',
+        'readme.md',
+        'license',
+        'license.md',
+        'license.txt',
+        '.gitignore',
+        '.gitattributes'
+      ];
 
       const fetchedFiles = data.tree
-        .filter((item) => item.type === 'blob')
+        .filter((item) => {
+          if (item.type !== 'blob') return false;
+          const fname = item.path.split('/').pop().toLowerCase();
+          return !IGNORED_FILES.includes(fname) && !item.path.startsWith('.git');
+        })
         .map((item, index) => {
           const parts = item.path.split('/');
           const filename = parts.pop();
