@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>V File System</title>
+  <title>File System</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Space+Grotesk:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -243,6 +243,53 @@ body {
   color: var(--text-primary);
   border-color: rgba(0, 242, 254, 0.35);
   transform: translateY(-1px);
+}
+
+.control-btn.active {
+  background: rgba(0, 245, 160, 0.15);
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  box-shadow: 0 0 15px rgba(0, 245, 160, 0.25);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Optimization Mode (Zero lag on low-end devices) */
+body.perf-mode #cyberCanvas,
+body.perf-mode .ambient-glow,
+body.perf-mode .pulse-ring {
+  display: none !important;
+}
+
+body.perf-mode .grid-overlay {
+  opacity: 0.15 !important;
+}
+
+body.perf-mode .site-header,
+body.perf-mode .search-box,
+body.perf-mode .file-card,
+body.perf-mode .state-card,
+body.perf-mode .autocomplete-dropdown,
+body.perf-mode .modal-backdrop,
+body.perf-mode .modal-dialog,
+body.perf-mode .toast {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+body.perf-mode .file-card {
+  box-shadow: none !important;
+  transition: none !important;
+  background: #0b1124 !important;
+}
+
+body.perf-mode .file-card:hover {
+  transform: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
 }
 
 /* Search Section */
@@ -1184,20 +1231,29 @@ body {
             <span class="brand-v">V</span>
             <div class="pulse-ring"></div>
           </div>
-          <span class="brand-title">V File System</span>
+          <span class="brand-title">File System</span>
         </div>
 
-        <button id="soundToggleBtn" class="control-btn" title="Звуковые эффекты">
-          <svg id="soundIconOn" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-          </svg>
-          <svg id="soundIconOff" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="1" y1="1" x2="23" y2="23"></line>
-            <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4.93"></path>
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-          </svg>
-        </button>
+        <div class="header-actions">
+          <button id="perfToggleBtn" class="control-btn" title="Режим оптимизации (для плавности на слабых устройствах)">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span id="perfBtnText">Оптимизация</span>
+          </button>
+
+          <button id="soundToggleBtn" class="control-btn" title="Звуковые эффекты">
+            <svg id="soundIconOn" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <svg id="soundIconOff" class="icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="1" y1="1" x2="23" y2="23"></line>
+              <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4.93"></path>
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -1288,7 +1344,7 @@ body {
 
     <!-- Footer -->
     <footer class="site-footer">
-      <span class="footer-logo">V File System</span>
+      <span class="footer-logo">File System</span>
       <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">© 2026</span>
     </footer>
 
@@ -1374,7 +1430,12 @@ body {
   let activeSearchQuery = '';
   let selectedDropdownIndex = -1;
   let soundEnabled = localStorage.getItem('v_sound') !== 'false';
+  let isPerfMode = localStorage.getItem('v_perf_mode') === 'true';
   let activePreviewFile = null;
+  let canvasAnimId = null;
+
+  const perfToggleBtn = document.getElementById('perfToggleBtn');
+  const perfBtnText = document.getElementById('perfBtnText');
 
   const fileSearchInput = document.getElementById('fileSearchInput');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
@@ -1472,8 +1533,41 @@ body {
     localStorage.setItem('v_sound', soundEnabled ? 'true' : 'false');
   }
 
+  // Performance / Optimization Mode
+  function updatePerfUI() {
+    if (isPerfMode) {
+      document.body.classList.add('perf-mode');
+      perfToggleBtn.classList.add('active');
+      perfBtnText.textContent = 'Оптимизация: ВКЛ';
+      perfToggleBtn.title = 'Режим оптимизации ВКЛ (анимации и размытие отключены для максимальной скорости)';
+    } else {
+      document.body.classList.remove('perf-mode');
+      perfToggleBtn.classList.remove('active');
+      perfBtnText.textContent = 'Оптимизация';
+      perfToggleBtn.title = 'Включить режим оптимизации (для плавности на слабых устройствах)';
+    }
+    localStorage.setItem('v_perf_mode', isPerfMode ? 'true' : 'false');
+  }
+
+  function togglePerfMode() {
+    isPerfMode = !isPerfMode;
+    if (isPerfMode) {
+      if (canvasAnimId) {
+        cancelAnimationFrame(canvasAnimId);
+        canvasAnimId = null;
+      }
+    }
+    updatePerfUI();
+    soundClick();
+    if (!isPerfMode) {
+      initCyberCanvas();
+    }
+    showToast(isPerfMode ? '⚡ Оптимизация ВКЛЮЧЕНА (эффекты отключены)' : '✨ Оптимизация ВЫКЛЮЧЕНА (эффекты активны)');
+  }
+
   // Canvas
   function initCyberCanvas() {
+    if (isPerfMode) return;
     const canvas = document.getElementById('cyberCanvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -1512,6 +1606,11 @@ body {
     }
 
     function animate() {
+      if (isPerfMode) {
+        canvasAnimId = null;
+        return;
+      }
+
       ctx.clearRect(0, 0, width, height);
 
       for (let i = 0; i < particles.length; i++) {
@@ -1556,7 +1655,7 @@ body {
         }
       }
 
-      requestAnimationFrame(animate);
+      canvasAnimId = requestAnimationFrame(animate);
     }
 
     animate();
@@ -2074,6 +2173,10 @@ body {
       updateSoundUI();
       if (soundEnabled) soundSuccess();
     });
+
+    perfToggleBtn.addEventListener('click', () => {
+      togglePerfMode();
+    });
   }
 
   // Helpers
@@ -2109,6 +2212,7 @@ body {
 
   // Init
   function init() {
+    updatePerfUI();
     updateSoundUI();
     initCyberCanvas();
     setupEvents();
