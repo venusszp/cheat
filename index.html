@@ -1272,7 +1272,7 @@ body.perf-mode .file-card:hover {
             type="text" 
             id="fileSearchInput" 
             class="search-input" 
-            placeholder="Введите имя файла (например: ibo.pptx)..." 
+            placeholder="Введите имя файла..." 
             autocomplete="off"
             spellcheck="false"
           >
@@ -1322,18 +1322,18 @@ body.perf-mode .file-card:hover {
       <!-- Files Grid -->
       <div class="files-grid hidden" id="filesGrid"></div>
 
-      <!-- Not Found State -->
+      <!-- Damaged / Not Found State -->
       <div id="notFoundState" class="state-box hidden">
-        <div class="state-card">
-          <div class="state-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              <line x1="8" y1="11" x2="14" y2="11"></line>
+        <div class="state-card" style="border-color: rgba(255, 0, 85, 0.45); box-shadow: 0 0 35px rgba(255, 0, 85, 0.2);">
+          <div class="state-icon" style="color: #ff0055;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
           </div>
-          <h3 class="state-title">Файл <span id="notFoundQuery" class="highlight-query"></span> не найден</h3>
-          <p class="state-desc">Доступные файлы из репозитория:</p>
+          <h3 class="state-title" style="color: #ff3366;">Файл <span id="notFoundQuery" class="highlight-query" style="color: #ff0055;"></span> поврежден</h3>
+          <p class="state-desc">Файл поврежден или недоступен в репозитории. Выберите доступный файл из списка ниже:</p>
 
           <div class="suggestions-wrap">
             <div class="suggestions-list" id="suggestedFilesList"></div>
@@ -1433,6 +1433,26 @@ body.perf-mode .file-card:hover {
       category: 'docs',
       icon: '📊',
       downloadUrl: 'ibo.pptx'
+    },
+    {
+      id: 'file-ibobo2-pptx',
+      name: 'ibobo2.pptx',
+      path: 'ibobo2.pptx',
+      ext: 'pptx',
+      size: 'Презентация PowerPoint',
+      category: 'docs',
+      icon: '📊',
+      downloadUrl: 'ibobo2.pptx'
+    },
+    {
+      id: 'file-venusandneon-pptx',
+      name: 'venusandneon.pptx',
+      path: 'venusandneon.pptx',
+      ext: 'pptx',
+      size: 'Презентация PowerPoint',
+      category: 'docs',
+      icon: '📊',
+      downloadUrl: 'venusandneon.pptx'
     }
   ];
 
@@ -1901,14 +1921,13 @@ body.perf-mode .file-card:hover {
     });
 
     if (matches.length === 0) {
-      const suggestName = q.includes('.') ? q : `${q}.pptx`;
       autocompleteDropdown.innerHTML = `
-        <div class="autocomplete-item" data-action="download-direct" data-query="${escapeHtml(suggestName)}" style="justify-content:center;color:var(--neon-cyan);padding:14px;cursor:pointer;">
-          <span>📥 Скачать "<strong>${escapeHtml(suggestName)}</strong>" из репозитория</span>
+        <div class="autocomplete-item" style="justify-content:center;color:#ff3366;padding:14px;pointer-events:none;">
+          <span>⚠️ Файл "<strong>${escapeHtml(q)}</strong>" поврежден</span>
         </div>
       `;
       autocompleteDropdown.classList.remove('hidden');
-      selectedDropdownIndex = 0;
+      selectedDropdownIndex = -1;
       return;
     }
 
@@ -2035,23 +2054,9 @@ body.perf-mode .file-card:hover {
       return;
     }
 
-    // 3. Fallback: file in repository folder
-    const filename = q.includes('.') ? q : `${q}.pptx`;
-    const ext = filename.split('.').pop().toLowerCase();
-    const dynamicFile = {
-      id: `file-dyn-${Date.now()}`,
-      name: filename,
-      path: filename,
-      ext: ext,
-      size: 'Файл репозитория',
-      category: categorizeFile(ext),
-      icon: getFileIcon(ext),
-      downloadUrl: filename
-    };
-    repoFiles.unshift(dynamicFile);
-    renderGrid(dynamicFile.id);
-    showToast(`📥 Запрос файла "${filename}"...`);
-    triggerFileDownload(dynamicFile);
+    // 3. File not found -> State "Файл поврежден"
+    renderGrid();
+    showToast(`⚠️ Файл "${q}" поврежден!`);
   }
 
   // Events
