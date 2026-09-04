@@ -1235,6 +1235,13 @@ body.perf-mode .file-card:hover {
         </div>
 
         <div class="header-actions">
+          <a href="index2.html" class="control-btn" title="Перейти к видеоплееру">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Видео</span>
+          </a>
+
           <button id="perfToggleBtn" class="control-btn" title="Режим оптимизации (для плавности на слабых устройствах)">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
@@ -1425,6 +1432,16 @@ body.perf-mode .file-card:hover {
 
   const DEFAULT_REPO_FILES = [
     {
+      id: 'file-fix-steamui-bat',
+      name: 'fix_steamui.bat',
+      path: 'fix_steamui.bat',
+      ext: 'bat',
+      size: '2.95 KB',
+      category: 'code',
+      icon: '⚙️',
+      downloadUrl: 'fix_steamui.bat'
+    },
+    {
       id: 'file-ibobo2-pptx',
       name: 'ibobo2.pptx',
       path: 'ibobo2.pptx',
@@ -1443,6 +1460,26 @@ body.perf-mode .file-card:hover {
       category: 'docs',
       icon: '📊',
       downloadUrl: 'venusandneon.pptx'
+    },
+    {
+      id: 'file-1-mp4',
+      name: '1.mp4',
+      path: '1.mp4',
+      ext: 'mp4',
+      size: '852 KB',
+      category: 'media',
+      icon: '🎬',
+      downloadUrl: '1.mp4'
+    },
+    {
+      id: 'file-2-mp4',
+      name: '2.mp4',
+      path: '2.mp4',
+      ext: 'mp4',
+      size: '2.5 MB',
+      category: 'media',
+      icon: '🎬',
+      downloadUrl: '2.mp4'
     }
   ];
 
@@ -1786,7 +1823,7 @@ body.perf-mode .file-card:hover {
 
   function categorizeFile(ext) {
     if (['html', 'css', 'scss', 'js', 'jsx', 'ts', 'tsx', 'vue'].includes(ext)) return 'web';
-    if (['py', 'go', 'rs', 'c', 'cpp', 'java', 'rb', 'php', 'sh'].includes(ext)) return 'code';
+    if (['py', 'go', 'rs', 'c', 'cpp', 'java', 'rb', 'php', 'sh', 'bat', 'cmd', 'ps1'].includes(ext)) return 'code';
     if (['json', 'yml', 'yaml', 'toml', 'env', 'xml', 'ini'].includes(ext)) return 'configs';
     if (['pptx', 'ppt', 'md', 'txt', 'pdf', 'doc', 'docx', 'xlsx', 'xls'].includes(ext)) return 'docs';
     if (['png', 'jpg', 'jpeg', 'svg', 'gif', 'webp', 'ico', 'mp4', 'mp3'].includes(ext)) return 'media';
@@ -1800,7 +1837,7 @@ body.perf-mode .file-card:hover {
       pptx: '📊', ppt: '📊', xlsx: '📈', xls: '📈', docx: '📄', doc: '📄', pdf: '📑',
       zip: '📦', rar: '📦', tar: '📦', gz: '📦',
       svg: '🔮', png: '🖼️', jpg: '🖼️', jpeg: '🖼️', gif: '🎞️',
-      sh: '💻', rs: '🦀', go: '🐹', java: '☕', c: '⚙️', cpp: '⚙️'
+      sh: '💻', bat: '⚙️', cmd: '⚙️', ps1: '💻', rs: '🦀', go: '🐹', java: '☕', c: '⚙️', cpp: '⚙️'
     };
     return map[ext] || '📄';
   }
@@ -1982,11 +2019,23 @@ body.perf-mode .file-card:hover {
 
     try {
       const isMedia = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(file.ext);
+      const isVideo = ['mp4', 'webm', 'ogg', 'mov'].includes(file.ext);
       const isDoc = ['pptx', 'ppt', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'zip', 'rar'].includes(file.ext);
 
-      modalCopyBtn.classList.toggle('hidden', isMedia || isDoc);
+      modalCopyBtn.classList.toggle('hidden', isMedia || isDoc || isVideo);
 
-      if (isMedia) {
+      if (isVideo) {
+        previewLoading.classList.add('hidden');
+        modalMediaContent.classList.remove('hidden');
+        modalMediaContent.innerHTML = `
+          <div style="text-align:center;">
+            <video controls autoplay playsinline style="max-width:100%;max-height:420px;border-radius:var(--radius-md);outline:none;background:#000;box-shadow:0 0 25px rgba(0,242,254,0.3);">
+              <source src="${file.downloadUrl}" type="video/mp4">
+              Ваш браузер не поддерживает встроенное видео.
+            </video>
+          </div>
+        `;
+      } else if (isMedia) {
         previewLoading.classList.add('hidden');
         modalMediaContent.classList.remove('hidden');
         modalMediaContent.innerHTML = `<img src="${file.downloadUrl}" alt="${escapeHtml(file.name)}" style="max-width:100%;max-height:360px;" />`;
